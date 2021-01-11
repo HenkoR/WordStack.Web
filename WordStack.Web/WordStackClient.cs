@@ -14,7 +14,7 @@ namespace WordStack.Web
         public Task<IEnumerable<WordType>> WordTypes();
         public Task<IEnumerable<Word>> Words(int wordTypeId);
         public Task<IEnumerable<Sentence>> Sentences();
-        public Task<string> AddNewSentence(Sentence sentence);
+        public Task AddNewSentence(Sentence sentence);
     }
 
     public class WordStackClient : IWordStackClient
@@ -25,16 +25,15 @@ namespace WordStack.Web
             Client = client;
         }
 
-        public async Task<string> AddNewSentence(Sentence sentence)
+        public async Task AddNewSentence(Sentence sentence)
         {
             var sentenceJson = new StringContent(JsonSerializer.Serialize(sentence), Encoding.UTF8, "application/json");
 
             using var httpResponse = await Client.PostAsync("/sentence", sentenceJson);
 
             httpResponse.EnsureSuccessStatusCode();
-
-            return httpResponse.Headers.Location.Segments.Last();
         }
+        
 
         public async Task<IEnumerable<Sentence>> Sentences()
         {
