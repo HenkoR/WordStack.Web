@@ -21,13 +21,14 @@
                 <div class="col">
                     <select id="WordTypeId" asp-for="Word.WordTypeId" class="form-control"
                             asp-items="@Model.WordTypeSL">
-                        <option value="">-- Select Word Type --</option>
+                        <option value="-1">-- Select Word Type --</option>
                     </select>
                 </div>
                 <div class="col">
                     <select id="WordId" asp-for="Word.StringValue" class="form-control selectpicker" data-live-search="true">
                         <option value="" data-hidden="true">-- Select Word --</option>
                     </select>
+                    <input asp-for="Word.StringValue" id="WordNew" class="form-control d-none" />
                 </div>
                 <div class="col">
                     <input type="button" onclick="addWord();" value="Add" class="btn btn-default" />
@@ -53,7 +54,18 @@
             if (sentence.value !== null && sentence.value !== '') {
                 sentence.value = sentence.value.concat(" ");
             }
-            sentence.value = sentence.value.concat(word.options[word.selectedIndex].text);
+            
+            if (!$("#WordNew").hasClass("d-none")) {
+                $("#WordNew").addClass("d-none");
+                sentence.value = sentence.value.concat($("#WordNew").val());
+            }
+            else {
+                sentence.value = sentence.value.concat(word.options[word.selectedIndex].text);
+            }
+            $("#WordId").empty();
+            $("#WordId").append("<option value='-1'>-- Select Word --</option>");
+            $('.selectpicker').selectpicker('refresh');
+            $("#WordTypeId").val("-1");
         }
 
         $(function () {
@@ -63,10 +75,23 @@
         });
 
         $(function () {
+            $("#WordId").on("change", function () {
+                let word = document.getElementById('WordId');
+                if (word.value === '0') {
+                    $("#WordNew").removeClass("d-none");
+                }
+                else {
+                    $("#WordNew").addClass("d-none");
+                }
+            });
+        });
+
+        $(function () {
             $("#WordTypeId").on("change", function () {
                 var wordTypeId = $(this).val();
                 $("#WordId").empty();
-                $("#WordId").append("<option value='' data-hidden='true'>-- Select Word --</option>");
+                $("#WordId").append("<option value='-1'>-- Select Word --</option>");
+                $("#WordId").append("<option value='0'>Other (specify)</option>");
                 $.getJSON(`?handler=Words&wordTypeId=${wordTypeId}`, (data) => {
                     $.each(data, function (i, item) {
                         $("#WordId").append(`<option value="${item.id}" data-tokens="${item.stringValue}">${item.stringValue}</option>`);
@@ -75,6 +100,8 @@
                 });
             });
         });
+
+
 
     </script>
 }
