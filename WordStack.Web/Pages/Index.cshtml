@@ -11,6 +11,8 @@
     <hr />
     <h2>Sentences</h2>
 
+</div>
+<div>
     <p>
         <a asp-page="Create">Create New</a>
     </p>
@@ -18,7 +20,11 @@
         <tbody>
             @foreach (var item in Model.Sentences)
             {
-                @Html.DisplayFor(modelItem => item.StringValue)
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StringValue)
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
