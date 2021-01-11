@@ -19,13 +19,15 @@
             </div>
             <div class="form-row">
                 <div class="col">
-                    <select asp-for="Word.WordTypeId" class="form-control"
+                    <select id="WordTypeId" asp-for="Word.WordTypeId" class="form-control"
                             asp-items="@Model.WordTypeSL">
                         <option value="">-- Select Word Type --</option>
                     </select>
                 </div>
                 <div class="col">
-                    <input asp-for="Word.StringValue" class="form-control" />
+                    <select id="WordId" asp-for="Word.StringValue" class="form-control selectpicker" data-live-search="true">
+                        <option value="" data-hidden="true">-- Select Word --</option>
+                    </select>
                 </div>
                 <div class="col">
                     <input type="button" onclick="addWord();" value="Add" class="btn btn-default" />
@@ -43,15 +45,36 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
-<script>
+    <script>
         function addWord() {
             let sentence = document.getElementById('Sentence_StringValue');
-            let word = document.getElementById('Word_StringValue');
+            let word = document.getElementById('WordId');
 
             if (sentence.value !== null && sentence.value !== '') {
                 sentence.value = sentence.value.concat(" ");
             }
-            sentence.value = sentence.value.concat(word.value);
+            sentence.value = sentence.value.concat(word.options[word.selectedIndex].text);
         }
-</script>
+
+        $(function () {
+            $('.selectpicker').selectpicker({
+                liveSearch: true
+            });
+        });
+
+        $(function () {
+            $("#WordTypeId").on("change", function () {
+                var wordTypeId = $(this).val();
+                $("#WordId").empty();
+                $("#WordId").append("<option value='' data-hidden='true'>-- Select Word --</option>");
+                $.getJSON(`?handler=Words&wordTypeId=${wordTypeId}`, (data) => {
+                    $.each(data, function (i, item) {
+                        $("#WordId").append(`<option value="${item.id}" data-tokens="${item.stringValue}">${item.stringValue}</option>`);
+                    });
+                    $('.selectpicker').selectpicker('refresh');
+                });
+            });
+        });
+
+    </script>
 }

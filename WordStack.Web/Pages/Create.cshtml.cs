@@ -16,11 +16,16 @@ namespace WordStack.Web.Pages
         private readonly IWordStackClient _context;
 
         public SelectList WordTypeSL { get; set; }
+        public SelectList WordSL { get; set; }
         [BindProperty]
         public Sentence Sentence { get; set; }
 
         [BindProperty]
         public Word Word { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public int wordTypeId { get; set; }
+        public int wordId { get; set; }
 
         public CreateModel(ILogger<CreateModel> logger, IWordStackClient context)
         {
@@ -30,10 +35,16 @@ namespace WordStack.Web.Pages
 
         public async Task OnGetAsync()
         {
-            await BindDropDown();
+            await BindWordTypeDropDown();
         }
 
-        async Task BindDropDown()
+        public async Task<JsonResult> OnGetWords()
+        {
+            var s = new JsonResult(await _context.Words(wordTypeId));
+            return new JsonResult(await _context.Words(wordTypeId));
+        }
+
+        async Task BindWordTypeDropDown()
         {
             var wordTypesQuery = await _context.WordTypes();
             WordTypeSL = new SelectList(wordTypesQuery.ToList(), "Id", "StringValue");
@@ -48,7 +59,7 @@ namespace WordStack.Web.Pages
             }
             catch
             {
-                await BindDropDown();
+                await BindWordTypeDropDown();
                 return Page();
             }
         }
