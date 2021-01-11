@@ -1,0 +1,57 @@
+﻿@page
+@model WordStack.Web.Pages.CreateModel
+@{
+    ViewData["Title"] = "Create Sentence";
+}
+
+<h2>Create</h2>
+<h4>Sentence</h4>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form method="post">
+            <div class="form-group">
+                <input asp-for="Sentence.Id" class="form-control" type="hidden" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Sentence</label>
+                <input asp-for="Sentence.StringValue" class="form-control" />
+            </div>
+            <div class="form-row">
+                <div class="col">
+                    <select asp-for="Word.WordTypeId" class="form-control"
+                            asp-items="@Model.WordTypeSL">
+                        <option value="">-- Select Word Type --</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <input asp-for="Word.StringValue" class="form-control" />
+                </div>
+                <div class="col">
+                    <input type="button" onclick="addWord();" value="Add" class="btn btn-default" />
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" asp-page-handler="SaveSentence" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script>
+        function addWord() {
+            let sentence = document.getElementById('Sentence_StringValue');
+            let word = document.getElementById('Word_StringValue');
+
+            if (sentence.value !== null && sentence.value !== '') {
+                sentence.value = sentence.value.concat(" ");
+            }
+            sentence.value = sentence.value.concat(word.value);
+        }
+</script>
+}
